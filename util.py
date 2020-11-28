@@ -1,4 +1,5 @@
 import json
+from config import study_dir
 
 conversion_list = [
     "Gene_stable_ID",
@@ -10,7 +11,7 @@ conversion_list = [
 
 
 def get_gene_data():
-    with open("gene_conversion.json", "r") as infile:
+    with open(f"{study_dir}/gene_conversion.json", "r") as infile:
         gene_data = json.load(infile)
     return gene_data
 
