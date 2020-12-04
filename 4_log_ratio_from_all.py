@@ -79,6 +79,10 @@ def get_log2_list(list1, outname):
         group1_fields = list1[idx][1:6]
         group2_fields = list1[idx][6:]
 
+        assert len(group1_fields) == len(
+            group2_fields
+        ), "input list contains incorrect number of columns"
+
         group1_floats = [float(i) for i in group1_fields]
         group2_floats = [float(i) for i in group2_fields]
 
