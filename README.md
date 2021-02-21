@@ -3,14 +3,6 @@
 
 [![N|Solid](https://ddfoqzqsu0zvp.cloudfront.net/media/documents/school-of-engineering-wordmark-side-blue.png)](https://nodesource.com/products/nsolid)
 
-
-Dillinger is a cloud-enabled, mobile-ready, offline-storage compatible,
-AngularJS-powered HTML5 Markdown editor.
-
-- Type some Markdown on the left
-- See HTML in the right
-- ✨Magic ✨
-
 ## To Run Workflow Shell Script
 
 - Adjust **config.sh** file to your environment
