@@ -8,8 +8,6 @@
 - Adjust **config.sh** file to your environment
 - Ensure you have all the tools installed that are named in **config.sh**
 - Ensure you have sample files in a directory that correspond to the sample names in **fastq_gz_file_pairs.txt**
-- Drag and drop markdown and HTML files into Dillinger
-- Export documents as Markdown, HTML and PDF
 
 ```
 bash workflow.sh
