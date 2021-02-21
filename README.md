@@ -1,7 +1,7 @@
 # HDAC4 RNA-seq project
 ## _Frank Zappulla_
 
-[![N|Solid](https://ddfoqzqsu0zvp.cloudfront.net/media/documents/school-of-engineering-wordmark-side-blue.png)](https://nodesource.com/products/nsolid)
+[![N|Solid](https://ddfoqzqsu0zvp.cloudfront.net/media/documents/school-of-engineering-wordmark-side-blue.png)](https://www.cse.uconn.edu/)
 
 ## To Run Workflow Shell Script
 
