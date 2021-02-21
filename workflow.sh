@@ -30,6 +30,7 @@ while read line; do
 
 	${salmon} quant -i ${salmon_index} -l A -1 ${trimmed_fwd} -2 ${trimmed_rev} --validateMappings -o ${salmon_results}/${base_dir}
 
+	# If you want to run loop once for testing purposes, uncomment the break
 	# break
 
 done < fastq_gz_file_pairs.txt

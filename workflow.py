@@ -1,7 +1,6 @@
 import json
 import math
 import numpy as np
-import statistics as stat
 from util import convert_gene
 from config import study_dir, results_dir, samples, pseudo_count, dynamic_pseudo_count
 
