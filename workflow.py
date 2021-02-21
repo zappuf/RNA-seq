@@ -3,10 +3,125 @@ import math
 import numpy as np
 import statistics as stat
 from util import convert_gene
-from config import study_dir, results_dir
+from config import study_dir, results_dir, samples, pseudo_count, dynamic_pseudo_count
 
-pseudo_count = 0.01
-dynamic_pseudo_count = True
+
+for sample_idx in range(len(samples)):
+    print(f"Working on sample {samples[sample_idx]}")
+    with open(f"salmon_mapped32/{samples[sample_idx]}/quant.sf", "r") as infile:
+        in_lines = infile.readlines()[1:]
+        for line_idx in range(len(in_lines)):
+            in_lines[line_idx] = in_lines[line_idx].strip()
+            fields = in_lines[line_idx].split("\t")
+            gene = fields[0]
+            count = fields[-1]
+            in_lines[line_idx] = (
+                f"{gene}\t{count}\n" if not sample_idx else f"{count}\n"
+            )
+    if not sample_idx:
+        with open("all_grouped.sf", "w+") as outfile:
+            for in_line in in_lines:
+                in_line = in_line.strip()
+                outfile.write(f"{in_line}\n")
+    else:
+        with open("all_grouped.sf", "r") as outfile:
+            out_lines = outfile.readlines()
+            for out_line_idx in range(len(out_lines)):
+                out_lines[out_line_idx] = out_lines[out_line_idx].strip()
+                fields = out_lines[out_line_idx].split("\t")
+                fields.append(in_lines[out_line_idx])
+                out_lines[out_line_idx] = "\t".join(fields)
+        with open("all_grouped.sf", "w") as outfile:
+            outfile.writelines(out_lines)
+
+with open(f"{results_dir}/all_grouped_filtered.sf", "w") as outfile:
+    with open(f"{study_dir}/all_grouped.sf") as infile:
+        lines = infile.readlines()
+        dropped_count = 0
+        for line in lines:
+            line = line.strip()
+            fields = line.split("\t")
+            ensembl = fields[0]
+            counts = fields[1:]
+            min10 = 0
+            keep_gene = False
+            # Keep only genes where at least 3 samples have count at least 10
+            for count in counts:
+                if float(count) >= 10.0:
+                    min10 += 1
+                    if min10 >= 3:
+                        keep_gene = True
+                        break
+            if keep_gene:
+                outfile.write(f"{ensembl}")
+                for count in counts:
+                    outfile.write(f"\t{count}")
+                outfile.write("\n")
+            else:
+                dropped_count += 1
+print(f"Done filtering! Dropped {dropped_count} transcripts")
+
+
+print("Normalizing values")
+samples = {}
+for i in range(20):
+    samples[f"{i}"] = []
+# print(f"Empty samples dict: {samples}")
+
+with open(f"{results_dir}/all_grouped_filtered_normalized.sf", "w") as outfile:
+    with open(f"{results_dir}/all_grouped_filtered.sf", "r") as infile:
+        lines = infile.readlines()
+        for line in lines:
+            line = line.strip()
+            vals = line.split("\t")[1:]
+            for i in range(20):
+                samples[f"{i}"].append(float(vals[i]))
+
+        for k, v in samples.items():
+            print(f"sample {int(k)+1} has {len(v)} gene counts")
+
+        percentiles = []
+        for k, v in samples.items():
+            percentile = np.percentile(v, 75)
+            print(f"Calculated 75th percentile for sample {int(k)+1}: {percentile}")
+            percentiles.append(percentile)
+
+        for line in lines:
+            line = line.strip()
+            fields = line.split("\t")
+            ensembl = fields[0]
+            counts = [float(count) for count in fields[1:]]
+            counts = np.array(counts)
+            normalized_counts = counts / percentiles
+            outfile.write(f"{ensembl}")
+            for norm_count in normalized_counts:
+                outfile.write(f"\t{norm_count}")
+            outfile.write("\n")
+
+print("QC step. Recalculating 75th percentile of normalized counts.")
+with open(f"{results_dir}/all_grouped_filtered_normalized.sf", "r") as infile:
+    samples = {}
+    for i in range(20):
+        samples[f"{i}"] = []
+    normalized_lines = infile.readlines()
+    for line in normalized_lines:
+        line = line.strip()
+        vals = line.split("\t")[1:]
+        for i in range(20):
+            samples[f"{i}"].append(float(vals[i]))
+
+    for k, v in samples.items():
+        print(f"sample {int(k)+1} has {len(v)} gene counts")
+
+    percentiles = []
+    for k, v in samples.items():
+        percentile = np.percentile(v, 75)
+        print(f"Recalculated 75th percentile for sample {int(k)+1}: {percentile}")
+        percentiles.append(percentile)
+
+
+print("Done normalizing!")
+
 
 F_KO = "F_KO_grouped.sf"
 F_WT = "F_WT_grouped.sf"
